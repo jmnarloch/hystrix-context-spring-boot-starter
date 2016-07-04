@@ -15,6 +15,16 @@
  */
 package io.jmnarloch.spring.boot.hystrix.support;
 
+import io.jmnarloch.spring.boot.hystrix.context.HystrixCallableWrapper;
+import org.junit.Test;
+import org.mockito.Mockito;
+
+import java.util.Collections;
+import java.util.concurrent.Callable;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+
 /**
  * Tests the {@link HystrixContextAwareConcurrencyStrategy} class.
  *
@@ -22,4 +32,59 @@ package io.jmnarloch.spring.boot.hystrix.support;
  */
 public class HystrixContextAwareConcurrencyStrategyTest {
 
+    @Test(expected = IllegalArgumentException.class)
+    public void shouldThrowIllegalArgumentException() {
+
+        // when
+        new HystrixContextAwareConcurrencyStrategy(null);
+    }
+
+    @Test
+    public void shouldNotWrapCallable() {
+
+        // given
+        final Callable callable = Mockito.mock(Callable.class);
+
+        // and
+        final HystrixContextAwareConcurrencyStrategy strategy = new HystrixContextAwareConcurrencyStrategy(
+                Collections.<HystrixCallableWrapper>emptyList()
+        );
+
+        // when
+        final Callable result = strategy.wrapCallable(callable);
+
+        // then
+        assertEquals(callable, result);
+    }
+
+    @Test
+    public void shouldWrapCallable() {
+
+        // given
+        final Callable callable = Mockito.mock(Callable.class);
+
+        // and
+        final HystrixContextAwareConcurrencyStrategy strategy = new HystrixContextAwareConcurrencyStrategy(
+                Collections.<HystrixCallableWrapper>singletonList(new SimpleHystrixCallableWrapper())
+        );
+
+        // when
+        final Callable result = strategy.wrapCallable(callable);
+
+        // then
+        assertNotEquals(callable, result);
+    }
+
+    private static class SimpleHystrixCallableWrapper implements HystrixCallableWrapper {
+
+        @Override
+        public <T> Callable<T> wrapCallable(final Callable<T> callable) {
+            return new Callable<T>() {
+                @Override
+                public T call() throws Exception {
+                    return callable.call();
+                }
+            };
+        }
+    }
 }
