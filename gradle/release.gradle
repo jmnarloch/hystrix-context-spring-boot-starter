@@ -35,15 +35,15 @@ uploadArchives {
             }
 
             pom.project {
-                name 'hystrix-context-boot-starter'
+                name 'hystrix-context-spring-boot-starter'
                 packaging 'jar'
                 description 'Spring Boot Hystrix Context'
-                url 'https://github.com/jmnarloch/hystrix-context-boot-starter'
+                url 'https://github.com/jmnarloch/hystrix-context-spring-boot-starter'
 
                 scm {
-                    connection 'scm:git:https://github.com/jmnarloch/hystrix-context-boot-starter.git'
-                    developerConnection 'scm:git:https://github.com/jmnarloch/hystrix-context-boot-starter.git'
-                    url 'https://github.com/jmnarloch/hystrix-context-boot-starter.git'
+                    connection 'scm:git:https://github.com/jmnarloch/hystrix-context-spring-boot-starter.git'
+                    developerConnection 'scm:git:https://github.com/jmnarloch/hystrix-context-spring-boot-starter.git'
+                    url 'https://github.com/jmnarloch/hystrix-context-spring-boot-starter.git'
                 }
 
                 licenses {
