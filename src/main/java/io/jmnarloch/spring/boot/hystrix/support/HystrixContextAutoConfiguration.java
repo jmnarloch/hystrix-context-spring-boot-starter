@@ -16,6 +16,10 @@
 package io.jmnarloch.spring.boot.hystrix.support;
 
 import com.netflix.hystrix.strategy.HystrixPlugins;
+import com.netflix.hystrix.strategy.eventnotifier.HystrixEventNotifier;
+import com.netflix.hystrix.strategy.executionhook.HystrixCommandExecutionHook;
+import com.netflix.hystrix.strategy.metrics.HystrixMetricsPublisher;
+import com.netflix.hystrix.strategy.properties.HystrixPropertiesStrategy;
 import io.jmnarloch.spring.boot.hystrix.context.HystrixCallableWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -43,9 +47,23 @@ public class HystrixContextAutoConfiguration {
     @PostConstruct
     public void configureHystrixConcurencyStrategy() {
         if (!wrappers.isEmpty()) {
+            resetPlugins();
+
             HystrixPlugins.getInstance().registerConcurrencyStrategy(
                     new HystrixContextAwareConcurrencyStrategy(wrappers)
             );
         }
+    }
+
+    private void resetPlugins() {
+        HystrixMetricsPublisher metricsPublisher = HystrixPlugins.getInstance().getMetricsPublisher();
+        HystrixEventNotifier eventNotifier = HystrixPlugins.getInstance().getEventNotifier();
+        HystrixPropertiesStrategy propertiesStrategy = HystrixPlugins.getInstance().getPropertiesStrategy();
+        HystrixCommandExecutionHook commandExecutionHook = HystrixPlugins.getInstance().getCommandExecutionHook();
+        HystrixPlugins.reset();
+        HystrixPlugins.getInstance().registerMetricsPublisher(metricsPublisher);
+        HystrixPlugins.getInstance().registerEventNotifier(eventNotifier);
+        HystrixPlugins.getInstance().registerPropertiesStrategy(propertiesStrategy);
+        HystrixPlugins.getInstance().registerCommandExecutionHook(commandExecutionHook);
     }
 }
